@@ -24,11 +24,9 @@ class MetadataBatchImporter(Component):
         'prestashop.shop',
     ]
 
-@prestashop
 class ShopGroupImporter(PrestashopImporter):
     _model_name = 'prestashop.shop.group'
 
 
-@prestashop
 class ShopGroupBatchImporter(DirectBatchImporter):
     _model_name = 'prestashop.shop.group'
