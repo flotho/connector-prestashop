@@ -38,13 +38,29 @@ class TestImportProduct(PrestashopTransactionCase):
         self.shop_group = self.env['prestashop.shop.group'].search([])
         self.shop = self.env['prestashop.shop'].search([])
 
-        mock_delay_record = mock.MagicMock()
-        self.instance_delay_record = mock_delay_record.return_value
-        self.patch_delay_record = mock.patch(
-            'odoo.addons.queue_job.models.base.DelayableRecordset',
-            new=mock_delay_record
+        self.mock_delay_import_image = mock.MagicMock()
+        self.patch_delay_import_image = mock.patch(
+            'openerp.addons.connector_prestashop.models.product_product'
+            '.common.set_product_image_variant',
+            new=self.mock_delay_import_image
         )
         self.patch_delay_record.start()
+
+        self.mock_delay_import_image = mock.MagicMock()
+        self.patch_delay_import_image = mock.patch(
+            'openerp.addons.connector_prestashop.models.product_image'
+            '.common.import_product_image',
+            new=self.mock_delay_import_image
+        )
+        self.patch_delay_import_image.start()
+
+        self.mock_delay_set_image = mock.MagicMock()
+        self.patch_delay_set_image = mock.patch(
+            'openerp.addons.connector_prestashop.models.product_product'
+            '.common.set_product_image_variant',
+            new=self.mock_delay_set_image
+        )
+        self.patch_delay_set_image.start()
 
     def tearDown(self):
         super(TestImportProduct, self).tearDown()
@@ -55,15 +71,24 @@ class TestImportProduct(PrestashopTransactionCase):
     def test_import_products(self):
         from_date = '2016-09-01 00:00:00'
         self.backend_record.import_products_since = from_date
-        self.backend_record.import_products()
-        self.instance_delay_record.import_products.assert_called_with(
-            self.backend_record, from_date)
+        import_job = ('openerp.addons.connector_prestashop.models'
+                      '.binding.common'
+                      '.import_record')
+        with mock.patch(import_job) as import_mock:
+            self.backend_record.import_products()
+            import_mock.delay.assert_called_with(
+                mock.ANY, self.backend_record.id,
+                from_date,
+                priority=10,
+            )
 
     @freeze_time('2016-09-13 00:00:00')
     @assert_no_job_delayed
     def test_import_products_batch(self):
         from_date = '2016-09-01 00:00:00'
         self.backend_record.import_products_since = from_date
+        record_job_path = ('openerp.addons.connector_prestashop.models'
+                           '.binding.common.import_record')
         # execute the batch job directly and replace the record import
         # by a mock (individual import is tested elsewhere)
         with recorder.use_cassette('test_import_product_batch') as cassette:

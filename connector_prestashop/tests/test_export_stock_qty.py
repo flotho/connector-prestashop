@@ -47,21 +47,22 @@ class TestExportStockQuantity(ExportStockQuantityCase):
                 0, delay_record_instance.export_inventory.call_count)
 
         self._change_product_qty(variant_binding.odoo_id, 42)
-        with mock.patch(delay_record_path) as delay_record_mock:
+        with mock.patch(export_job_path) as export_record_mock:
             variant_binding.with_context(
                 connector_no_export=False).recompute_prestashop_qty()
-            delay_record_instance = delay_record_mock.return_value
-            self.assertEqual(
-                1, delay_record_instance.export_inventory.call_count)
-            delay_record_instance.export_inventory.assert_called_with(
-                fields=['quantity'])
+            self.assertEqual(1, export_record_mock.delay.call_count)
+            export_record_mock.delay.assert_called_with(
+                mock.ANY,
+                'prestashop.product.combination',
+                variant_binding.id,
+                fields=['quantity'],
+                priority=20,
+            )
 
         self._change_product_qty(variant_binding.odoo_id, 42)
-        with mock.patch(delay_record_path) as delay_record_mock:
+        with mock.patch(export_job_path) as export_record_mock:
             # the function call the update qty for template and combination
             # depending on the state of the tests we may have one or two call
-            self.env['prestashop.product.template'].export_product_quantities(
-                self.backend_record)
-            delay_record_instance = delay_record_mock.return_value
-            self.assertGreater(
-                delay_record_instance.export_inventory.call_count, 0)
+            export_product_quantities(self.conn_session,
+                                      self.backend_record.ids)
+            self.assertGreater(export_record_mock.delay.call_count, 0)

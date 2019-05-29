@@ -39,9 +39,10 @@ class TestImportSale(PrestashopTransactionCase):
     def test_import_sales(self):
         from_date = '2016-12-01 00:00:00'
         self.backend_record.import_orders_since = from_date
-        delay_record_path = ('odoo.addons.queue_job.models.base.'
-                             'DelayableRecordset')
-        with mock.patch(delay_record_path) as delay_record_mock:
+        import_job = ('openerp.addons.connector_prestashop.models'
+                      '.binding.common'
+                      '.import_bacth')
+        with mock.patch(import_job) as import_mock:
             self.backend_record.import_sale_orders()
             delay_record_instance = delay_record_mock.return_value
             delay_record_instance.import_orders_since.assert_called_with(
@@ -54,8 +55,8 @@ class TestImportSale(PrestashopTransactionCase):
     def test_import_sale_batch(self):
         from_date = '2016-12-01 00:00:00'
         self.backend_record.import_res_partner_from_date = from_date
-        delay_record_path = ('odoo.addons.queue_job.models.base.'
-                             'DelayableRecordset')
+        record_job_path = ('openerp.addons.connector_prestashop.models'
+                           '.binding.common.import_batch')
         # execute the batch job directly and replace the record import
         # by a mock (individual import is tested elsewhere)
         with recorder.use_cassette('test_import_sale_batch') as cassette, \

@@ -5,28 +5,27 @@ import logging
 from contextlib import closing, contextmanager
 
 import odoo
-from odoo import _
+from odoo import _, fields
 
+from odoo.addons.queue_job.job import job
 from odoo.addons.queue_job.exception import (
     RetryableJobError,
     FailedJobError,
 )
 
-from odoo.addons.component.core import AbstractComponent
+from odoo.addons.component.core import AbstractComponent, Component
+from odoo.addons.connector.exception import IDMissingInBackend
+from odoo.addons.queue_job.exception import NothingToDoJob
 
 _logger = logging.getLogger(__name__)
 
 RETRY_ON_ADVISORY_LOCK = 1  # seconds
 RETRY_WHEN_CONCURRENT_DETECTED = 1  # seconds
 
-
 def import_record():
     pass
-
-
 def import_batch():
     pass
-
 
 class PrestashopBaseImporter(AbstractComponent):
     _name = 'prestashop.base.importer'
@@ -61,8 +60,7 @@ class PrestashopBaseImporter(AbstractComponent):
             importer_class = PrestashopImporter
         binder = self.binder_for(binding_model)
         if always or not binder.to_internal(prestashop_id):
-            importer = self.component(usage='record.importer',
-                                      model_name=binding_model)
+            importer = self.component(usage='record.importer', model_name=binding_model)
             importer.run(prestashop_id, **kwargs)
 
 
@@ -172,14 +170,14 @@ class PrestashopImporter(AbstractComponent):
             with closing(registry.cursor()) as cr:
                 try:
                     new_env = odoo.api.Environment(cr, self.env.uid,
-                                                   self.env.context)
+                                                      self.env.context)
                     # connector_env = self.connector_env.create_environment(
                     #     self.backend_record.with_env(new_env),
                     #     model_name or self.model._name,
                     #     connector_env=self.connector_env
                     # )
-                    with self.backend_record.with_env(new_env).work_on(
-                            self.model._name) as work2:
+                    with self.backend_record.with_env(
+                        new_env).work_on(self.model._name) as work2:
                         yield work2
                 except:
                     cr.rollback()
@@ -190,8 +188,7 @@ class PrestashopImporter(AbstractComponent):
                     cr.commit()  # pylint: disable=invalid-commit
 
     def _check_in_new_connector_env(self):
-        # with self.do_in_new_connector_env() as new_connector_env:
-        with self.do_in_new_connector_env():
+        with self.do_in_new_connector_env() as new_connector_env:
             # Even when we use an advisory lock, we may have
             # concurrent issues.
             # Explanation:
@@ -365,21 +362,7 @@ class DelayedBatchImporter(AbstractComponent):
 
     def _import_record(self, external_id, **kwargs):
         """ Delay the import of the records"""
-        priority = kwargs.pop('priority', None)
-        eta = kwargs.pop('eta', None)
-        max_retries = kwargs.pop('max_retries', None)
-        description = kwargs.pop('description', None)
-        channel = kwargs.pop('channel', None)
-        identity_key = kwargs.pop('identity_key', None)
-
-        self.env[self.model._name].with_delay(
-            priority=priority,
-            eta=eta,
-            max_retries=max_retries,
-            description=description,
-            channel=channel,
-            identity_key=identity_key
-        ).import_record(
+        self.env[self.model._name].with_delay().import_record(
             backend=self.backend_record,
             prestashop_id=external_id,
             **kwargs)
@@ -507,9 +490,9 @@ class TranslatableRecordImporter(AbstractComponent):
         super(TranslatableRecordImporter, self)._import(binding)
 
     def _after_import(self, binding):
-        # TODO: Improve the way translations are called
-        # https://github.com/OCA/connector/issues/282
         """ Hook called at the end of the import """
+        #TODO: Improve the way translations are called
+        #https://github.com/OCA/connector/issues/282
         for lang_code, lang_record in self.other_langs_data.iteritems():
             map_record = self.mapper.map_record(lang_record)
             binding.with_context(

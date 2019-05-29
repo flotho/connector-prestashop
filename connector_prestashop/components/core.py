@@ -14,3 +14,4 @@ class BasePrestaShopConnectorComponent(AbstractComponent):
     _name = 'base.prestashop.connector'
     _inherit = 'base.connector'
     _collection = 'prestashop.backend'
+

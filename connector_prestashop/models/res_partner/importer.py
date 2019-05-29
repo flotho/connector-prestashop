@@ -3,9 +3,11 @@
 
 import re
 
-from odoo import _
+from odoo import fields, _
+from odoo.addons.queue_job.job import job
 
 
+from odoo.addons.connector.checkpoint import checkpoint
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import (
     mapping, external_to_m2o, only_create)
@@ -34,7 +36,7 @@ class PartnerImportMapper(Component):
         binder = self.binder_for('prestashop.groups.pricelist')
         pricelist = binder.to_internal(record['id_default_group'], unwrap=True)
         if not pricelist:
-            return {}
+            return {'property_product_pricelist': self.backend_record.pricelist_id.id}
         return {'property_product_pricelist': pricelist.id}
 
     @mapping
@@ -219,5 +221,5 @@ class AddressImporter(Component):
 
 class AddressBatchImporter(Component):
     _name = 'prestashop.address.batch.importer'
-    _inherit = 'prestashop.delayed.batch.importer'
+    _inherit = 'prestashop.direct.batch.importer'
     _apply_on = 'prestashop.address'

@@ -77,7 +77,7 @@ class PrestashopBinding(models.AbstractModel):
             deleter = work.component(usage='record.exporter.deleter')
             return deleter.run(external_id)
 
-    # TODO: Research
+    #TODO: Research
     @api.multi
     def resync(self):
         func = import_record
@@ -86,6 +86,16 @@ class PrestashopBinding(models.AbstractModel):
         for record in self:
             func(self.env, self._name, record.backend_id.id,
                  record.prestashop_id)
+        return True
+
+    @api.multi
+    def resync_export(self):
+        for record in self:
+            if self.env.context.get('connector_delay'):
+                record.with_delay().export_record()
+            for record in self:
+                record.export_record()
+
         return True
 
 

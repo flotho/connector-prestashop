@@ -34,11 +34,11 @@ class PaymentModeBatchImporter(Component):
              ('company_id', '=', self.backend_record.company_id.id),
              ],
         )
-        if not journals: 
+
+        if not journals:
             return
         else:
             journals = journals[0]
-            
         mode = self.model.create({
             'name': record['payment'],
             'company_id': self.backend_record.company_id.id,

@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import openerp.addons.decimal_precision as dp
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.addons.queue_job.job import job, related_action
 from odoo.addons.component.core import Component
 
@@ -65,7 +65,6 @@ class PrestashopSaleOrder(models.Model):
         readonly=True,
     )
 
-    @job(default_channel='root.prestashop')
     def import_orders_since(self, backend, since_date=None, **kwargs):
         """ Prepare the import of orders modified on PrestaShop """
         filters = None
@@ -73,8 +72,7 @@ class PrestashopSaleOrder(models.Model):
             filters = {'date': '1', 'filter[date_upd]': '>[%s]' % (since_date)}
         now_fmt = fields.Datetime.now()
         self.env['prestashop.sale.order'].with_delay(
-            priority=10).import_batch(
-            backend, filters=filters)
+            priority=5, max_retries=0).import_batch(backend, filters=filters)
         if since_date:
             filters = {'date': '1', 'filter[date_add]': '>[%s]' % since_date}
         self.env['prestashop.mail.message'].import_batch(backend, filters)
@@ -104,11 +102,13 @@ class PrestashopSaleOrder(models.Model):
                 return state_list.prestashop_state_id.prestashop_id
         return None
 
+
     @job(default_channel='root.prestashop')
     @related_action(action='related_action_unwrap_binding')
     @api.multi
     def export_sale_state(self):
         for sale in self:
+            backend = sale.backend_id
             new_state = sale.find_prestashop_state()
             if not new_state:
                 continue
@@ -208,10 +208,7 @@ class SaleOrderAdapter(Component):
     _export_node_name = 'order'
 
     def update_sale_state(self, prestashop_id, datas):
-        return self.client.add(
-            self.backend_record.get_version_ps_key('order_histories'),
-            datas
-            )
+        return self.client.add(self.backend_record.get_version_ps_key('order_histories'), datas)
 
 
 class SaleOrderLineAdapter(Component):

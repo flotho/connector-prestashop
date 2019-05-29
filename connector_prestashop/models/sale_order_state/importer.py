@@ -4,7 +4,6 @@
 from odoo.addons.connector.components.mapper import mapping
 from odoo.addons.component.core import Component
 
-
 class SaleOrderStateMapper(Component):
     _name = 'prestashop.sale.order.state.mapper'
     _inherit = 'prestashop.import.mapper'

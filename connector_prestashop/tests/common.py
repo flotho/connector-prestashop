@@ -4,6 +4,7 @@
 
 import functools
 
+from odoo.addons.connector.connector import ConnectorEnvironment
 from odoo.addons.component.tests.common import SavepointComponentCase
 
 from contextlib import contextmanager

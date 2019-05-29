@@ -27,9 +27,10 @@ class TestImportCarrier(PrestashopTransactionCase):
 
     @assert_no_job_delayed
     def test_import_carriers(self):
-        delay_record_path = ('odoo.addons.queue_job.models.base.'
-                             'DelayableRecordset')
-        with mock.patch(delay_record_path) as delay_record_mock:
+        import_job = ('openerp.addons.connector_prestashop.models'
+                      '.binding.common'
+                      '.import_record')
+        with mock.patch(import_job) as import_mock:
             self.backend_record.import_carriers()
             delay_record_instance = delay_record_mock.return_value
             delay_record_instance.import_batch.assert_called_with(
@@ -37,8 +38,8 @@ class TestImportCarrier(PrestashopTransactionCase):
 
     @assert_no_job_delayed
     def test_import_products_batch(self):
-        delay_record_path = ('odoo.addons.queue_job.models.base.'
-                             'DelayableRecordset')
+        record_job_path = ('openerp.addons.connector_prestashop.models'
+                           '.binding.common.import_record')
         # execute the batch job directly and replace the record import
         # by a mock (individual import is tested elsewhere)
         with recorder.use_cassette('test_import_carrier_batch') as cassette, \

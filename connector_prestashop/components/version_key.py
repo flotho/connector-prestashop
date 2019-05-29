@@ -4,9 +4,6 @@
 
 from odoo import models
 from odoo.addons.component.core import Component
-import logging
-
-_logger = logging.getLogger(__name__)
 
 
 class VersionKeyModel(models.TransientModel):
@@ -24,12 +21,10 @@ class VersionKey(Component):
     }
 
     def get_key(self, key):
-        output_key = self.keys.get(key) or key
-        _logger.info("Output key changed from %s to %s" % (key, output_key))
-        return output_key
+        return self.keys.get(key) or key
 
 
-class VersionKey1609(Component):
+class VersionKey_1_6_0_9(Component):
     _name = '_prestashop.version.key.1.6.0.9'
     _inherit = '_prestashop.version.key'
     _usage = 'prestashop.version.key.1.6.0.9'
@@ -49,7 +44,7 @@ class VersionKey1609(Component):
     }
 
 
-class VersionKey1612(Component):
+class VersionKey_1_6_1_2(Component):
     _name = '_prestashop.version.key.1.6.1.2'
     _inherit = '_prestashop.version.key'
     _usage = 'prestashop.version.key.1.6.1.2'
@@ -74,9 +69,8 @@ class VersionKey1612(Component):
         'messages': 'customer_messages',
         'manufacturers': 'manufacturers',
     }
-
-
-class VersionKey1619(Component):
+    
+class VersionKey_1_6_1_9(Component):
     _name = '_prestashop.version.key.1.6.1.9'
     _inherit = '_prestashop.version.key'
     _usage = 'prestashop.version.key.1.6.1.9'

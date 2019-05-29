@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _
+from odoo import _, fields
 
 from odoo.addons.connector.exception import MappingError
+from odoo.addons.queue_job.job import job
 from odoo.addons.connector.components.mapper import (
     mapping,
     only_create,
 )
+from ...components.importer import (
+    import_batch,
+)
 from odoo.addons.component.core import Component
 
+class RefundImporter(Component):
+    _name = 'prestashop.refund.importer'
+    _inherit = 'prestashop.importer'
+    _apply_on = 'prestashop.refund'
 
 class RefundImporter(Component):
     _name = 'prestashop.refund.importer'
@@ -31,7 +39,7 @@ class RefundImporter(Component):
             invoice.signal_workflow('invoice_open')
         else:
             self.backend_record.add_checkpoint(
-                invoice,
+                invoice, 
                 message=_('The refund for order %s has a different amount '
                           'in PrestaShop and in Odoo.') % invoice.origin
             )
