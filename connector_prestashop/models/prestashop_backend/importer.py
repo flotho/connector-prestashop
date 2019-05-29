@@ -4,6 +4,7 @@
 from odoo import _
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping
+from odoo.addons.connector_prestashop.components.importer import PrestashopImporter
 
 
 class MetadataBatchImporter(Component):
