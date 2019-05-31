@@ -159,7 +159,6 @@ class SaleOrderImportMapper(Component):
         return orders
 
     def _get_discounts_lines(self, record):
-        return {}
         if record['total_discounts'] == '0.00':
             return []
         adapter = self.component(
