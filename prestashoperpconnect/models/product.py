@@ -217,7 +217,7 @@ class TemplateRecordImport(TranslatableRecordImport):
         self.import_product_options()
         
     def _after_import(self, erp_id):
-        self.import_images(erp_id.id)
+        #self.import_images(erp_id.id) # This one is commented because of PS error unsolved : PrestaShopWebServiceError: 'PrestaShop error: 500 Internal Server Error. [PHP Notice #8] Undefined index: id_image (
         # TODO : check what's wrong in this mapper
 #        self.import_default_image(erp_id.id)
         self.import_supplierinfo(erp_id.id)
