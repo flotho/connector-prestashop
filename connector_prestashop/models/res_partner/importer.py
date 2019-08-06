@@ -21,7 +21,7 @@ class PartnerImportMapper(Component):
     direct = [
         ('date_add', 'date_add'),
         ('date_upd', 'date_upd'),
-#         ('email', 'email'),
+        ('email', 'email'),
         ('newsletter', 'newsletter'),
         ('company', 'company'),
         ('active', 'active'),
