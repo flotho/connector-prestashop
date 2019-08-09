@@ -220,7 +220,8 @@ class GenericAdapter(AbstractComponent):
             options,
         )
         res = self.client.edit(
-            self._prestashop_model, {self._export_node_name: attributes}, options=options)
+            self._prestashop_model, {self._export_node_name: attributes})
+        
         if self._export_node_name_res:
             return res['prestashop'][self._export_node_name_res]['id']
         return res
