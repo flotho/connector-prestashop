@@ -10,8 +10,8 @@ class AccountTaxImporter(Component):
     _apply_on = 'prestashop.account.tax'
 
 
-class AccountTaxImporter(AutoMatchingImporter):
-    _model_name = 'prestashop.account.tax'
+# class AccountTaxImporter(AutoMatchingImporter):
+#     _model_name = 'prestashop.account.tax'
     _erp_field = 'amount'
     _ps_field = 'rate'
 
