@@ -255,7 +255,7 @@ class PrestashopBackend(models.Model):
                 with backend.work_on(model_name) as work:
                     importer = work.component(usage='auto.matching.importer')
                     importer.run()
-            self.env['prestashop.account.tax.group'].import_batch(backend)
+#             self.env['prestashop.account.tax.group'].import_batch(backend)
             self.env['prestashop.sale.order.state'].import_batch(backend)
         return True
 
