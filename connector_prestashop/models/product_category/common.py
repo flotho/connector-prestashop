@@ -45,9 +45,10 @@ class PrestashopProductCategory(models.Model):
     meta_title = fields.Char(string='Meta title', translate=True)
     active = fields.Boolean(string='Active', default=True)
     position = fields.Integer(string='Position')
+    prestashop_parent_category_id = fields.Integer(string='parent category PS id')
 
     _sql_constraints = [
-        ('prestashop_erp_uniq', 'unique(backend_id, openerp_id)',
+        ('prestashop_erp_uniq', 'unique(backend_id, openerp_id, )',
          'A erp record with same ID on PrestaShop already exists.'),
     ]
 

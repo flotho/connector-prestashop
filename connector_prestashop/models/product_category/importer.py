@@ -28,6 +28,7 @@ class ProductCategoryMapper(ImportMapper):
         ('position', 'position')
     ]
 
+    @only_create
     @mapping
     def name(self, record):
         if record['name'] is None:
@@ -43,7 +44,12 @@ class ProductCategoryMapper(ImportMapper):
         if record['id_parent'] == '0':
             return {}
         parent = self.binder_for().to_openerp(record['id_parent'], unwrap=True)
-        return {'parent_id': parent.id}
+        categ_binder = self.binder_for(
+                        'prestashop.product.category')
+        parent_categ_id  = categ_binder.to_openerp(
+                        record['id_parent'], unwrap=True)
+        return {'parent_id': parent.id,
+                'prestashop_parent_category_id': parent_categ_id.id}
 
     @mapping
     def data_add(self, record):
@@ -67,6 +73,8 @@ class ProductCategoryMapper(ImportMapper):
                         'prestashop.product.category')
             categ_id  = categ_binder.to_openerp(
                         record['id'], unwrap=True)
+            parent_categ_id  = categ_binder.to_openerp(
+                        record['id_parent'], unwrap=True)
             
             if categ_id:
                 #If already bound with this id, force the binding
@@ -74,16 +82,16 @@ class ProductCategoryMapper(ImportMapper):
             
             #If not, implement a way to map on categ name.
             name = self.name(record)['name']
-            domain = [('name', '=', name)]
+            domain = [('name', '=', name),]
             
             categ_bound = self.env['prestashop.product.category'].search(
-                [('backend_id', '!=', self.backend_record.id)]
+                [('backend_id', '=', self.backend_record.id),]
                 )
             
-            domain.append(('id', 'not in', [c.id for c in categ_bound ]))
-            attribute = self.env['product.category'].search(domain)
-            if len(attribute) == 1 :
-                return {'openerp_id': attribute.id}                    
+            domain.append(('id', 'not in', [c.openerp_id.id for c in categ_bound ]))
+            categ = self.env['product.category'].search(domain, order='id')
+            if len(categ) >= 1 :
+                return {'openerp_id': categ[0].id}                    
         else:
             return {}
 
