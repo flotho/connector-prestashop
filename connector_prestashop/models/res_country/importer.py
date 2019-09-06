@@ -13,7 +13,7 @@ class CountryImporter(AutoMatchingImporter):
     _ps_field = 'iso_code'
 
     def _compare_function(self, ps_val, erp_val, ps_dict, erp_dict):
-        if len(erp_val) >= 2 and len(ps_val) >= 2 and \
-                erp_val[0:2].lower() == ps_val[0:2].lower():
+        if len(erp_val) == len(ps_val)  and \
+                erp_val.lower() == ps_val.lower():
             return True
         return False
