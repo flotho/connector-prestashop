@@ -43,13 +43,13 @@ class PartnerCategoryImporter(TranslatableRecordImporter):
     def _after_import(self, binding):
         super(PartnerCategoryImporter, self)._after_import(binding)
         record = self.prestashop_record
-        if float(record['reduction']):
-            import_record(
-                self.session,
-                'prestashop.groups.pricelist',
-                self.backend_record.id,
-                record['id']
-            )
+#         if float(record['reduction']):
+#             import_record(
+#                 self.session,
+#                 'prestashop.groups.pricelist',
+#                 self.backend_record.id,
+#                 record['id']
+#             )
 
 
 @prestashop

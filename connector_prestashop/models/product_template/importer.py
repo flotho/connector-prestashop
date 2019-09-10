@@ -107,9 +107,10 @@ class TemplateMapper(ImportMapper):
         return {'date_upd': record['date_upd']}
 
     def has_combinations(self, record):
-        combinations = record.get('associations', {}).get(
-            'combinations', {}).get('combinations', [])
-        return len(combinations) != 0
+        associations = record.get('associations', {})
+        combinations = associations.get('combinations', {}).get(
+            self.backend_record.get_version_ps_key('combinations'))
+        return len(combinations or '') != 0
 
     def _template_code_exists(self, code):
         model = self.session.env['product.template']
@@ -131,10 +132,12 @@ class TemplateMapper(ImportMapper):
                 template = self.env['product.template']
                 associations = record.get('associations', {})
                 combinations = associations.get('combinations', {}).get(
-                                'combinations', [])
-                if len(combinations) == 1 :
-                    #Defensive mode when product have no combinations, force the list mode
+                    self.backend_record.get_version_ps_key('combinations'))
+                if len(combinations) == 1:
+                    # Defensive mode when product have no combinations, force
+                    # the list mode
                     combinations = [combinations]
+
                 for prod in combinations:
                     backend_adapter = self.unit_for(
                                 BackendAdapter, 'prestashop.product.combination')
@@ -158,9 +161,11 @@ class TemplateMapper(ImportMapper):
                             raise ValidationError(_('Error! Multiple products ' 
                                         'found with combinations reference %s.' 
                                         'Maybe consider to update you datas') % code)
-                        template |= product.product_tmpl_id
                         
-                _logger.debug('template %s' % template)
+                        
+                        template |= product.product_tmpl_id
+                    _logger.debug('Template found %s from product code %s' % 
+                                  (template, code))
                 if len(template) == 1:
                     return {'openerp_id': template.id}
                 if len(template) > 1 :
@@ -504,8 +509,11 @@ class ProductTemplateImporter(TranslatableRecordImporter):
         prestashop_record = self._get_prestashop_data()
         associations = prestashop_record.get('associations', {})
 
-        combinations = associations.get('combinations', {}).get(
-            'combinations', [])
+        ps_key = self.backend_record.get_version_ps_key('combinations')
+        combinations = associations.get('combinations', {}).get(ps_key, [])
+
+        if not isinstance(combinations, list):
+            combinations = [combinations]
 
         with self.session.change_context(skip_check_default_variant=
                 self.backend_record.matching_product_template):

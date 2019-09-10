@@ -74,7 +74,7 @@ class ProductCombinationImporter(PrestashopImporter):
                         combination['id'], unwrap=True)
                     product_product.with_context(
                         connector_no_export=True).write(
-                        {'image_ids': [(6, 0, images.ids)]})
+                        {'image_ids': [(6, 0, [x.id for x in images])]})
             except PrestaShopWebServiceError:
                 # TODO: why is it silented?
                 pass
@@ -155,6 +155,7 @@ class ProductCombinationMapper(ImportMapper):
             )
             yield option_value_binding.openerp_id
 
+    @only_create
     @mapping
     def name(self, record):
         template = self.get_main_template_binding(record)
@@ -175,7 +176,8 @@ class ProductCombinationMapper(ImportMapper):
     @mapping
     def main_template_id(self, record):
         template_binding = self.get_main_template_binding(record)
-        return {'main_template_id': template_binding.id}
+        return {'main_template_id': template_binding.id,
+                'name_template': template_binding.name}
 
     def _template_code_exists(self, code):
         model = self.session.env['product.product']
@@ -208,6 +210,7 @@ class ProductCombinationMapper(ImportMapper):
         else:
             return {}
 
+    @only_create
     @mapping
     def default_code(self, record):        
         code = record.get('reference')
@@ -228,6 +231,7 @@ class ProductCombinationMapper(ImportMapper):
     def backend_id(self, record):
         return {'backend_id': self.backend_record.id}
 
+    @only_create
     @mapping
     def ean13(self, record):
         barcode = None
@@ -366,6 +370,7 @@ class ProductCombinationOptionValueAdapter(GenericAdapter):
     _model_name = 'prestashop.product.combination.option.value'
     _prestashop_model = 'product_option_values'
     _export_node_name = 'product_option_value'
+    _export_node_name_res = 'product_option_value'
 
 
 @prestashop

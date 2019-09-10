@@ -420,7 +420,8 @@ class SaleOrderLineMapper(ImportMapper):
             )
             if not product:
                 return self.tax_id(record)
-        return {'product_id': product.id}
+        return {'product_id': product.id,
+                'product_uom': product.uom_id.id}
 
     def _find_tax(self, ps_tax_id, record):
         binder = self.binder_for('prestashop.account.tax')
@@ -446,7 +447,7 @@ class SaleOrderLineMapper(ImportMapper):
 
 
 @prestashop
-class SaleOrderLineDiscountImporter(ImportMapper):
+class SaleOrderLineDiscountMapper(ImportMapper):
     _model_name = 'prestashop.sale.order.line.discount'
 
     direct = []
@@ -471,7 +472,8 @@ class SaleOrderLineDiscountImporter(ImportMapper):
     @mapping
     def product_id(self, record):
         if self.backend_record.discount_product_id:
-            return {'product_id': self.backend_record.discount_product_id.id}
+            return {'product_id': self.backend_record.discount_product_id.id,
+                    'product_uom': self.backend_record.discount_product_id.uom_id.id}
         product_discount = self.session.env.ref(
             'connector_ecommerce.product_product_discount')
         return {'product_id': product_discount.id}

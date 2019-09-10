@@ -45,7 +45,8 @@ class PrestashopDeliveryCarrier(models.Model):
 
     _sql_constraints = [
         ('prestashop_erp_uniq', 'unique(backend_id, openerp_id)',
-         'A erp record with same ID on PrestaShop already exists.'),
+         'A erp record with same ID on PrestaShop already exists ' 
+         'with the same id_reference.'),
     ]
 
 

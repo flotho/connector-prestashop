@@ -44,11 +44,12 @@ class PartnerImportMapper(ImportMapper):
     def openerp_id(self, record):
         """ Will bind the product to an existing one with the same code """
         if self.backend_record.matching_customer:
-            code = record.get(self.backend_record.matching_customer_ch.value)
+            key = self.backend_record.matching_customer_ch.value
+            code = record.get(key)
             
             if code:
                 partner = self.env['res.partner'].search(
-                [('ref', '=', code)], limit=1)
+                [(key, '=', code)], limit=1)
                 if partner:
                     return {'openerp_id': partner.id}
         else:
@@ -170,16 +171,16 @@ class AddressImportMapper(ImportMapper):
     @mapping
     def openerp_id(self, record):
         """ Will bind the product to an existing one with the same code """
-        if self.backend_record.matching_customer:
-            code = self.parent_id(record)['parent_id']
-            to_match = self.name(record)['name']
-            if code and to_match:
-                address = self.env['res.partner'].search(
-                [('name', '=', to_match),('parent_id','=',code)], limit=1)
-                if address:
-                    return {'openerp_id': address.id}
-        else:
-            return {}
+#         if self.backend_record.matching_customer:
+#             code = self.parent_id(record)['parent_id']
+#             to_match = self.name(record)['name']
+#             if code and to_match:
+#                 address = self.env['res.partner'].search(
+#                 [('name', '=', to_match),('parent_id','=',code)], limit=1)
+#                 if address:
+#                     return {'openerp_id': address.id}
+#         else:
+        return {}
 
 
     

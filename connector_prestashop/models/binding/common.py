@@ -36,3 +36,18 @@ class PrestashopBinding(models.AbstractModel):
             func(session, self._name, record.backend_id.id,
                  record.prestashop_id)
         return True
+    
+    
+    
+    @api.multi
+    def resync_export(self):
+        #To be checked if compatibility with connector and queue 9.x
+        for record in self:
+            if self.env.context.get('connector_delay'):
+                record.with_delay().export_record()
+            for record in self:
+                record.export_record()
+
+        return True
+
+

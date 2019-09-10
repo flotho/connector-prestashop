@@ -43,6 +43,7 @@ class PrestashopBackend(models.Model):
             ('1.5', '< 1.6.0.9'),
             ('1.6.0.9', '1.6.0.9 - 1.6.0.10'),
             ('1.6.0.11', '>= 1.6.0.11'),
+            ('1.7.5.0', '>= 1.7.5.0'),
         ]
     version = fields.Selection(
         selection='_select_versions',
@@ -314,10 +315,24 @@ class PrestashopBackend(models.Model):
                 'order_histories': 'order_histories?sendemail=1'},
             
             
-        }
-        if self.version == '1.6.0.9':
-            key = keys_conversion[self.version][key]
-        return key
+            '1.7.5.0': {
+                'product_option_value': 'product_option_value',
+                'category': 'categories',
+                'image': 'image',
+                'order_slip': 'order_slip',
+                'order_slip_detail': 'order_slip_details',
+                'order_row': 'order_row',
+                'group': 'group',
+                'tax': 'tax',
+                'product_features': 'product_features',
+                'combinations': 'combination',
+                'tag': 'tags',
+                'messages': 'customer_messages',
+                'manufacturers': 'manufacturers',
+                'order_histories': 'order_histories?sendemail=1'},
+            
+        }            
+        return keys_conversion[self.version][key] or key 
 
     # TODO: new API
     def _scheduler_launch(self, cr, uid, callback, domain=None,
