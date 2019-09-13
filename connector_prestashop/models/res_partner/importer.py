@@ -180,6 +180,15 @@ class AddressImportMapper(Component):
         return {'customer': True}
     
     @mapping
+    def lang(self, record):
+        binder = self.binder_for('prestashop.res.lang')
+        erp_lang = None
+        if record.get('id_lang'):
+            erp_lang = binder.to_internal(record['id_lang'])
+        if not erp_lang:
+            return {'lang': False}
+
+    @mapping
     def country(self, record):
         if record.get('id_country'):
             binder = self.binder_for('prestashop.res.country')
