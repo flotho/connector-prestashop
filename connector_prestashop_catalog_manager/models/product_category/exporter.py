@@ -21,7 +21,6 @@ class ProductCategoryMapper(Component):
     _name = 'prestashop.product.category.export.mapper'
     _inherit = 'translation.prestashop.export.mapper'
     _apply_on = 'prestashop.product.category'
-
     _model_name = 'prestashop.product.category'
 
     _translatable_fields = [
@@ -81,12 +80,12 @@ class ProductCategoryMapper(Component):
 
 class ProductCategoryExporter(Component):
     _name = 'prestashop.product.category.exporter'
-    _usage = 'prestashop.product.category.exporter'
     _inherit = 'translation.prestashop.exporter'
     _apply_on = 'prestashop.product.category'
     _model_name = 'prestashop.product.category'
 
     _translatable_fields = {
+         
         'prestashop.product.category': [
             'name',
             'description',
@@ -102,3 +101,9 @@ class ProductCategoryExporter(Component):
         record = self.binding and self.binding.odoo_id
         if record and record.parent_id:
             self._export_dependency(record.parent_id, 'prestashop.product.category')
+            
+            
+    def _run(self, fields=None, **kwargs):
+        if self.binding.prestashop_id:
+            self.binding.import_record(self.binding.backend_id, self.binding.prestashop_id)
+        return super(ProductCategoryExporter, self)._run(fields=fields, **kwargs)            
