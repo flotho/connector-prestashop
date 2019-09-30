@@ -249,6 +249,10 @@ class SaleOrderImportMapper(Component):
     @mapping
     def backend_id(self, record):
         return {'backend_id': self.backend_record.id}
+    
+    @mapping
+    def warehouse_id(self, record):
+        return {'warehouse_id': self.backend_record.wahrehouse_id.id}
 
     @mapping
     def payment(self, record):
