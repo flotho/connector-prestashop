@@ -80,9 +80,9 @@ class PrestashopBinding(models.AbstractModel):
     #TODO: Research
     @api.multi
     def resync(self):
-        func = import_record
+        func = self.import_record
         if self.env.context.get('connector_delay'):
-            func = import_record.delay
+            func = self.import_record.delay
         for record in self:
             func(self.env, self._name, record.backend_id.id,
                  record.prestashop_id)
