@@ -84,7 +84,7 @@ class PrestashopBinding(models.AbstractModel):
         if self.env.context.get('connector_delay'):
             func = self.import_record.delay
         for record in self:
-            func(self.env, self._name, record.backend_id.id,
+            func(record.backend_id.id,
                  record.prestashop_id)
         return True
 
