@@ -64,7 +64,6 @@ class TemplateMapper(Component):
             if tax.price_include:
                 return price * factor_tax
 
-    @only_create
     @mapping
     def list_price(self, record):
         price = 0.0

@@ -250,7 +250,7 @@ class ProductCombinationMapper(Component):
             if tax.price_include:
                 return price * factor_tax
 
-    @only_create
+
     @mapping
     def specific_price(self, record):
         product = self.binder_for(
