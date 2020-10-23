@@ -132,9 +132,9 @@ class VersionKey1768(Component):
 
 
     keys = {
-        'product_option_value': 'product_option_value',
+        'product_option_value': 'product_option_values',
         'category': 'categories',
-        'image': 'image',
+        'image': 'images',
         'order_slip': 'order_slip',
         'order_slip_detail': 'order_slip_details',
         'order_row': 'order_row',

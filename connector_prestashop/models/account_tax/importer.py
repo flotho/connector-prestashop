@@ -15,6 +15,7 @@ class AccountTaxImporter(AutoMatchingImporter):
     _erp_field = 'amount'
     _ps_field = 'rate'
 
+
     def _compare_function(self, ps_val, erp_val, ps_dict, erp_dict):
         if self.backend_record.taxes_included and erp_dict['price_include']:
             taxes_inclusion_test = True
