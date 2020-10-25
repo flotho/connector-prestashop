@@ -7,6 +7,8 @@ from odoo.addons.connector.components.mapper import (
 )
 from odoo.addons.component.core import Component
 
+import logging
+_logger = logging.getLogger(__name__)
 
 class TaxGroupMapper(Component):
     _name = 'prestashop.account.tax.group.import.mapper'
@@ -44,6 +46,13 @@ class TaxGroupImporter(Component):
 
 #     _model_name = 'prestashop.account.tax.group'
 
+
+    def _has_to_skip(self):
+        """ Return True if the import can be skipped """
+        skip =  not self.prestashop_record.get('active', False) or self.prestashop_record.get('deleted', False)
+        _logger.debug("Taxes group %s has to be skipped because of its states %s ?" % (self.prestashop_record, skip))
+        return skip
+       
 
 class TaxGroupBatchImporter(Component):
     _name = 'prestashop.account.tax.group.direct.batch.importer'
