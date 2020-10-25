@@ -91,14 +91,15 @@ class TemplateMapper(Component):
             if ps_tags:
                 return {'tags': ','.join(x['name'] for x in ps_tags)}
 
-    #@mapping
-    #def name(self, record):
-    #    if record['name']:
-    #        return {
-    #            'name': record['name'],
-    #            'description_sale': record['name'],
-    #        }
-    #    return {'name': 'noname'}
+    @only_create
+    @mapping
+    def name(self, record):
+        if record['name']:
+            return {
+                'name': record['name'],
+                'description_sale': record['name'],
+            }
+        return {'name': 'noname'}
 
     @only_create
     @mapping
