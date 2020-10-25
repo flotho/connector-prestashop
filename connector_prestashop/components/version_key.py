@@ -141,7 +141,7 @@ class VersionKey1768(Component):
         'group': 'groups',
         'tax': 'taxes',
         'product_features': 'product_features',
-        'combinations': 'combination',
+        'combinations': 'combinations',
         'tag': 'tags',
         'messages': 'customer_messages',
         'manufacturers': 'manufacturers',
