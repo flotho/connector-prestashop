@@ -15,6 +15,7 @@ from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import (
     mapping, external_to_m2o, only_create)
 from odoo.exceptions import ValidationError
+from odoo.addons.queue_job.job import identity_exact
 
 
 import datetime
@@ -416,7 +417,8 @@ class ProductInventoryBatchImporter(Component):
     def _import_record(self, record_id, record=None, **kwargs):
         """ Delay the import of the records"""
         assert record
-        self.env['_import_stock_available'].with_delay().import_record(
+        self.env['_import_stock_available'].with_delay(
+            identity_key=identity_exact).import_record(
             self.backend_record,
             record_id,
             record=record,
@@ -588,7 +590,8 @@ class ProductTemplateImporter(Component):
                                 **kwargs)
 
     def _delay_product_image_variant(self, combinations, **kwargs):
-        delayable = self.env['prestashop.product.combination'].with_delay(priority=15)
+        delayable = self.env['prestashop.product.combination'].with_delay(
+            identity_key=identity_exact, priority=15)
         delayable.set_product_image_variant(
             self.backend_record,
             combinations,
@@ -626,7 +629,8 @@ class ProductTemplateImporter(Component):
             images = [images]
         for image in images:
             if image.get('id'):
-                delayable = self.env['prestashop.product.image'].with_delay(priority=10)
+                delayable = self.env['prestashop.product.image'].with_delay(
+                    identity_key=identity_exact, priority=10)
                 delayable.import_product_image(
                     self.backend_record,
                     prestashop_record['id'],

@@ -6,6 +6,7 @@ from odoo import models, fields
 from odoo.addons.queue_job.job import job
 from odoo.addons.component.core import Component
 from ...components.importer import import_batch
+from odoo.addons.queue_job.job import identity_exact
 
 
 class ResPartner(models.Model):
@@ -96,9 +97,11 @@ class PrestashopResPartner(models.Model):
                 'filter[date_upd]': '>[%s]' % since_date}
         now_fmt = fields.Datetime.now()
         self.env['prestashop.res.partner.category'].with_delay(
+            identity_key=identity_exact,
             priority=10
         ).import_batch(backend=backend_record, filters=filters, **kwargs)
         self.env['prestashop.res.partner'].with_delay(
+            identity_key=identity_exact,
             priority=15
         ).import_batch(backend=backend_record, filters=filters, **kwargs)
         backend_record.import_partners_since = now_fmt

@@ -5,6 +5,7 @@ from odoo import models, fields, api
 from odoo.addons.queue_job.job import job, related_action
 from ...components.importer import import_record
 from odoo.addons.connector.exception import RetryableJobError
+from odoo.addons.queue_job.job import identity_exact
 
 
 class PrestashopBinding(models.AbstractModel):
@@ -92,7 +93,7 @@ class PrestashopBinding(models.AbstractModel):
     def resync_export(self):
         for record in self:
             if self.env.context.get('connector_delay'):
-                record.with_delay().export_record()
+                record.with_delay(identity_key=identity_exact).export_record()
             for record in self:
                 record.export_record()
 

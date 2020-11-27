@@ -16,6 +16,7 @@ from odoo.addons.queue_job.exception import (
 from odoo.addons.component.core import AbstractComponent, Component
 from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.queue_job.exception import NothingToDoJob
+from odoo.addons.queue_job.job import identity_exact
 
 _logger = logging.getLogger(__name__)
 
@@ -362,7 +363,7 @@ class DelayedBatchImporter(AbstractComponent):
 
     def _import_record(self, external_id, **kwargs):
         """ Delay the import of the records"""
-        self.env[self.model._name].with_delay().import_record(
+        self.env[self.model._name].with_delay(identity_key=identity_exact).import_record(
             backend=self.backend_record,
             prestashop_id=external_id,
             **kwargs)

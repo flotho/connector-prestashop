@@ -4,6 +4,7 @@
 import logging
 from odoo.addons.component.core import Component
 from contextlib import contextmanager
+from odoo.addons.queue_job.job import identity_exact
 
 from odoo import models, fields, api, exceptions, _
 
@@ -304,16 +305,16 @@ class PrestashopBackend(models.Model):
     def update_product_stock_qty(self):
         for backend_record in self:
             backend_record.env['prestashop.product.template']\
-                .with_delay().export_product_quantities(backend=backend_record)
+                .with_delay(identity_key=identity_exact).export_product_quantities(backend=backend_record)
             backend_record.env['prestashop.product.combination']\
-                .with_delay().export_product_quantities(backend=backend_record)
+                .with_delay(identity_key=identity_exact).export_product_quantities(backend=backend_record)
         return True
 
     @api.multi
     def import_stock_qty(self):
         for backend_record in self:
             backend_record.env['prestashop.product.template']\
-                .with_delay().import_inventory(backend_record)
+                .with_delay(identity_key=identity_exact).import_inventory(backend_record)
 
     @api.multi
     def import_sale_orders(self):

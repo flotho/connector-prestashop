@@ -7,6 +7,7 @@ from odoo.addons.component.core import Component
 from ...components.backend_adapter import (
     PrestaShopWebServiceImage,
 )
+from odoo.addons.queue_job.job import identity_exact
 
 
 # pylint: disable=consider-merging-classes-inherited
@@ -38,12 +39,12 @@ class PrestashopSupplier(models.Model):
         if since_date:
             filters = {'date': '1', 'filter[date_upd]': '>[%s]' % (since_date)}
         now_fmt = fields.Datetime.now()
-        self.env['prestashop.supplier'].with_delay().import_batch(
+        self.env['prestashop.supplier'].with_delay(identity_key=identity_exact).import_batch(
             backend,
             filters,
             **kwargs
         )
-        self.env['prestashop.product.supplierinfo'].with_delay().import_batch(
+        self.env['prestashop.product.supplierinfo'].with_delay(identity_key=identity_exact).import_batch(
             backend,
             **kwargs
         )

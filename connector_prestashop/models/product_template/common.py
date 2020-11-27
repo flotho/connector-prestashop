@@ -9,6 +9,7 @@ from odoo.addons import decimal_precision as dp
 from odoo.addons.queue_job.job import job
 from odoo.addons.component.core import Component
 from odoo.addons.component_event import skip_if
+from odoo.addons.queue_job.job import identity_exact
 
 import logging
 
@@ -158,10 +159,11 @@ class PrestashopProductTemplate(models.Model):
         now_fmt = fields.Datetime.now()
 
         self.env['prestashop.product.category'].with_delay(
+            identity_key=identity_exact,
             priority=10).import_batch(backend, filters=filters)
 
         self.env['prestashop.product.template'].with_delay(
-            priority=15).import_batch(backend, filters=filters)
+            priority=15, identity_key=identity_exact).import_batch(backend, filters=filters)
 
         backend.import_products_since = now_fmt
         return True
@@ -276,6 +278,6 @@ class PrestashopProductQuantityListener(Component):
             set(fields).intersection(self._get_inventory_fields())
         )
         if inventory_fields:
-            record.with_delay(priority=20).export_inventory(
+            record.with_delay(priority=20, identity_key=identity_exact).export_inventory(
                 fields=inventory_fields
             )

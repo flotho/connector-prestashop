@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from odoo import models
+from odoo.addons.queue_job.job import identity_exact
 
 from odoo.addons.connector.components.mapper import (
     mapping,
@@ -87,7 +88,7 @@ class ProductCombinationImporter(Component):
             # 'filter[id_product]': ps_id,
             'filter[id_product_attribute]': ps_id
         }
-        self.env['prestashop.product.supplierinfo'].with_delay().import_batch(
+        self.env['prestashop.product.supplierinfo'].with_delay(identity_key=identity_exact).import_batch(
             self.backend_record,
             filters=filters
         )

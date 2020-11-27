@@ -5,6 +5,8 @@ import openerp.addons.decimal_precision as dp
 from odoo import models, fields, api, _
 from odoo.addons.queue_job.job import job, related_action
 from odoo.addons.component.core import Component
+from odoo.addons.queue_job.job import identity_exact
+
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -72,7 +74,8 @@ class PrestashopSaleOrder(models.Model):
             filters = {'date': '1', 'filter[date_upd]': '>[%s]' % (since_date)}
         now_fmt = fields.Datetime.now()
         self.env['prestashop.sale.order'].with_delay(
-            priority=5, max_retries=0).import_batch(backend, filters=filters)
+            priority=5, max_retries=0,
+            identity_key=identity_exact).import_batch(backend, filters=filters)
         if since_date:
             filters = {'date': '1', 'filter[date_add]': '>[%s]' % since_date}
         self.env['prestashop.mail.message'].import_batch(backend, filters)
@@ -247,4 +250,4 @@ class PrestashopSaleOrderListener(Component):
             )
             if states:
                 for binding in record.prestashop_bind_ids:
-                    binding.with_delay(priority=20).export_sale_state()
+                    binding.with_delay(identity_key=identity_exact,priority=20).export_sale_state()

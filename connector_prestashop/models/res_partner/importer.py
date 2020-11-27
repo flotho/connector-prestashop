@@ -5,6 +5,7 @@ import re
 
 from odoo import fields, _
 from odoo.addons.queue_job.job import job
+from odoo.addons.queue_job.job import identity_exact
 
 
 from odoo.addons.connector.checkpoint import checkpoint
@@ -114,7 +115,7 @@ class ResPartnerImporter(Component):
         super(ResPartnerImporter, self)._after_import(binding)
         binder = self.binder_for()
         ps_id = binder.to_external(binding)
-        self.env['prestashop.address'].with_delay(priority=10).import_batch(
+        self.env['prestashop.address'].with_delay(priority=10, identity_key=identity_exact).import_batch(
             backend=self.backend_record,
             filters={'filter[id_customer]': '%d' % (ps_id,)})
 

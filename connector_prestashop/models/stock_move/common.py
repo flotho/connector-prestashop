@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.addons.component.core import Component
+from odoo.addons.queue_job.job import identity_exact
 
 
 class StockLocation(models.Model):
@@ -61,4 +62,4 @@ class PrestashopStockPickingListener(Component):
 
     def on_tracking_number_added(self, record):
         for binding in record.sale_id.prestashop_bind_ids:
-            binding.with_delay().export_tracking_number()
+            binding.with_delay(identity_key=identity_exact).export_tracking_number()

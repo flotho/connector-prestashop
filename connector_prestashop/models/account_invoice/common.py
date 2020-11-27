@@ -4,6 +4,7 @@
 from odoo import api, fields, models
 
 from odoo.addons.component.core import Component
+from odoo.addons.queue_job.job import identity_exact
 
 
 class AccountInvoice(models.Model):
@@ -81,7 +82,7 @@ class PrestashopRefund(models.Model):
         if since_date:
             filters = {'date': '1', 'filter[date_upd]': '>[%s]' % (since_date)}
         now_fmt = fields.Datetime.now()
-        self.env['prestashop.refund'].with_delay().import_batch(
+        self.env['prestashop.refund'].with_delay(identity_key=identity_exact).import_batch(
             backend,
             filters,
             **kwargs
