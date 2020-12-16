@@ -18,9 +18,14 @@ class CombinationInventoryExporter(Component):
         }
 
     def get_quantity_vals(self, product):
-        return {
+        datas = {
             'quantity': int(product.quantity),
             'out_of_stock': int(product.main_template_id.out_of_stock),
-            'available_date_attribute': product.next_available_date.strftime('%Y-%m-%d') if product.next_available_date else '',
-
         }
+        
+        if product.next_available_date and product.next_available_date != '':
+            datas.update({
+                'available_date_attribute': product.next_available_date.strftime('%Y-%m-%d')
+                })
+        
+        return datas
