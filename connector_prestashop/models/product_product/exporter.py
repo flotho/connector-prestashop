@@ -23,9 +23,14 @@ class CombinationInventoryExporter(Component):
             'out_of_stock': int(product.main_template_id.out_of_stock),
         }
         
-        if product.next_available_date and product.next_available_date != '':
+        if product.next_available_date :
+            next_available_date = product.next_available_date
+            if isinstance(next_available_date, str):
+                next_available_date = fields.Date.from_string(product.next_available_date)
+           
             datas.update({
-                'available_date_attribute': product.next_available_date.strftime('%Y-%m-%d')
+                'available_date_attribute': next_available_date.strftime('%Y-%m-%d')
                 })
+
         
         return datas
